@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>My Wasm Project</title>
+  </head>
+
+  <body>
+    <script>
+      class Coordinate {
+        constructor(x, y) {
+          this.x = x;
+          this.y = y;
+        }
+    
+        printValues() {
+          return `(x:${this.x} y:${this.y})`;
+        }
+      }
+    </script>
+    <script type="module">
+      // Importing WASM as a JS module requires us to call an init function provided by the default export.
+      // This is planned to be changed in the future.
+      import * as wasm from "./pkg/rust_wasm.js";
+
+      wasm.default().then((module) => {
+        console.log(wasm.char_example("R"));
+
+        console.log(wasm.string_example("Jane"));
+
+        console.log(wasm.str_example("John"));
+
+        console.log(wasm.number_example(28));
+
+        console.log(wasm.mixed_array_example([2, null, undefined, "Hola", true]));
+
+        console.log(wasm.typed_array_example([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]));
+
+        console.log(wasm.option_example());
+
+        // console.log(wasm.result_example());
+
+        // Enum \\
+        let rustEnum = wasm.ExampleEnum.Yes;
+        console.log(wasm.verify_enum_choice(rustEnum));
+
+        // Struct \\
+        let rustStruct = wasm.ExampleStruct.new(6);
+        console.log(rustStruct); // this will contain a pointer
+        console.log(rustStruct.value);
+
+        rustStruct.write_method(200);
+        console.log(rustStruct.read_method());
+
+        let newRustStruct = rustStruct.transfer_ownership();
+        //rustStruct.read_method(); // rustStruct is now invalid. An error will throw.
+
+        wasm.manual_bindings_example();
+
+        wasm.print_things();
+      });
+    </script>
+  </body>
+</html>
